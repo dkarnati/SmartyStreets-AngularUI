@@ -1,4 +1,4 @@
-# Address Lookup using SmartyStreets and Angular 10
+# Address Lookup using SmartyStreets SDK and Angular 10
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.5.
 

@@ -1,14 +1,24 @@
 <form [formGroup]="addressForm" novalidate (ngSubmit)="onSubmit()">
-  <mat-card class="shipping-card">
+  <mat-card class="shipping-card m-4">
     <mat-card-header>
-      <mat-card-title>Address Information</mat-card-title>
+      <div mat-card-avatar><mat-icon color="primary">home</mat-icon></div>
+      <mat-card-title style="color: indigo !important;">Enter Your Address Information</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <!-- <div class="row">
         <div class="col"> -->
           <mat-radio-group aria-label="Select an option" formControlName="addressVerificationType">
-            <mat-radio-button value="1">US Address Lookup</mat-radio-button>
-            <mat-radio-button value="2">US Address Verification</mat-radio-button>
+            <mat-radio-button value="1">US Address Lookup
+              <mat-icon aria-hidden="false" aria-label="Example home icon" color="primary"
+              matTooltip="Select this option if you want to look up an address. Type partial address in Address Line 1 and click 'Lookup'"
+              matTooltipPosition="right">info</mat-icon>
+            </mat-radio-button>
+            <mat-radio-button value="2">US Address Verification<span>
+              <mat-icon aria-hidden="false" aria-label="Example home icon" color="primary"
+              matTooltip="Select this option if you want to verify an address. Enter address in Address Line 1, City and State and click 'Verify'"
+              matTooltipPosition="right">info</mat-icon>
+            </span>
+            </mat-radio-button>
           </mat-radio-group>
         <!-- </div>
         </div> -->
@@ -40,7 +50,8 @@
       <div class="row">
         <div class="col">
           <mat-form-field class="full-width">
-            <input matInput placeholder="Address" formControlName="address" #inputAutoComplete
+            <mat-label>Address Line 1</mat-label>
+            <input matInput placeholder="Address Line 1" formControlName="address" #inputAutoComplete
             (change)="onAddressTextChange()"
             [matAutocomplete]='auto'/>
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)='getAddressSelected($event.option.value)'>
@@ -62,13 +73,13 @@
           <!-- <button mat-raised-button type="button" color="primary" (click)="addressChange($event)">Lookup</button> -->
         </div>
       </div>
-      <div class="row" *ngIf="!hasUnitNumber">
+      <!-- <div class="row" *ngIf="!hasUnitNumber">
         <div class="col">
           <button mat-button type="button" (click)="hasUnitNumber = !hasUnitNumber">
             + Add C/O, Apt, Suite, Unit
           </button>
         </div>
-      </div>
+      </div> -->
       <div class="row" *ngIf="hasUnitNumber">
         <div class="col">
           <mat-form-field class="full-width">
@@ -79,13 +90,15 @@
       <div class="row">
         <div class="col">
           <mat-form-field class="full-width">
+            <mat-label>County</mat-label>
             <input matInput placeholder="County" formControlName="county">
           </mat-form-field>
         </div>
       </div>
       <div class="row">
-        <div class="col">
+        <div class="col" >
           <mat-form-field class="full-width">
+            <mat-label>City</mat-label>
             <input matInput placeholder="City" formControlName="city">
             <mat-error *ngIf="addressForm.controls['city'].hasError('required')">
               City is <strong>required</strong>
@@ -94,8 +107,9 @@
         </div>
         <div class="col">
           <mat-form-field class="full-width">
+            <mat-label>State</mat-label>
             <mat-select placeholder="State" formControlName="state">
-              <mat-option *ngFor="let state of states" [value]="state.abbreviation">
+              <mat-option *ngFor="let state of states" [value]="state.abbreviation" >
                 {{ state.name }}
               </mat-option>
             </mat-select>
@@ -108,12 +122,14 @@
       <div class="row">
         <div class="col">
           <mat-form-field class="full-width">
+            <mat-label>Postal Code</mat-label>
             <input matInput #postalCode maxlength="5" placeholder="Postal Code" type="number" formControlName="postalCode">
             <mat-hint align="end">{{postalCode.value.length}} / 5</mat-hint>
           </mat-form-field>
         </div>
         <div class="col">
           <mat-form-field class="full-width">
+            <mat-label>Postal Code Ext.</mat-label>
             <input matInput #postalCodeExt maxlength="5" placeholder="Postal Code Ext." type="number" formControlName="postalCodeExt">
             <mat-hint align="end">{{postalCodeExt.value.length}} / 5</mat-hint>
           </mat-form-field>

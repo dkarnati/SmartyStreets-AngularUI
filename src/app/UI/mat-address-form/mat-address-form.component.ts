@@ -1,3 +1,5 @@
+import { UsStreetVerificationHelper } from './../../../Util/UsStreetVerificationHelper';
+// import { Lookup } from 'smartystreets-javascript-sdk/src/us_street/Lookup';
 import { environment } from './../../../environments/environment';
 import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -14,17 +16,19 @@ export class MatAddressFormComponent {
     company: null,
     firstName: [null, Validators.required],
     lastName: [null, Validators.required],
-    address: [null, Validators.required],
+    address: ['4 NOOK ALLEY', Validators.required],
     address2: null,
-    city: [null, Validators.required],
-    state: [null, Validators.required],
-    postalCode: [null, Validators.compose([
-      Validators.required, Validators.minLength(5), Validators.maxLength(5)])
-    ],
+    city: ['Meccanicsburg', Validators.required],
+    state: ['PA', Validators.required],
+    county: [{value:null, disabled: true}],
+    postalCode: [null, Validators.compose([Validators.minLength(5), Validators.maxLength(5)])],
+    postalCodeExt: [null, Validators.compose([Validators.minLength(4), Validators.maxLength(4)])],
+    addressVerificationType : ['2', Validators.required],
     shipping: ['free', Validators.required]
   });
 
   hasUnitNumber = false;
+
   @ViewChild(MatAutocompleteTrigger, {read: MatAutocompleteTrigger}) inputAutoComplete: MatAutocompleteTrigger;
 
   states = [
@@ -89,8 +93,9 @@ export class MatAddressFormComponent {
     {name: 'Wyoming', abbreviation: 'WY'}
   ];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder,private usVerify:UsStreetVerificationHelper) {}
   addressOptions = <any>[];
+
   addressChange(evt){
     if((this.addressForm.get('address').value as string).length > 5){
       this.AutocompleteAddress(this.addressForm.get('address').value).then(data => {
@@ -103,38 +108,78 @@ export class MatAddressFormComponent {
       this.addressOptions = [];
     }
   }
+  //perform address verification on submit
   onSubmit() {
-    // this.AutocompleteAddress(this.addressForm.get('address').value).then(data => {
-    //   this.addressOptions = data.result as any[];
-    //   console.log(this.addressOptions);
-    // }).catch();
+    this.addressOptions = [];
+    const Lookup = SmartyStreetsSDK.usStreet.Lookup;
+    const lookup1 = new Lookup();
+    lookup1.inputId = "24601";  // Optional ID from your system
+    // lookup1.addressee = "John Doe";
+    lookup1.street = this.addressForm.controls['address'].value;
+    lookup1.street2 = this.addressForm.controls['address2'].value;
+    // lookup1.secondary = this.addressForm.controls['address'].value;
+    // lookup1.urbanization = "";  // Only applies to Puerto Rico addresses
+    lookup1.city = this.addressForm.controls['city'].value;
+    lookup1.state = this.addressForm.controls['state'].value;
+    lookup1.zipCode =  this.addressForm.controls['postalCode'].value;
+    lookup1.maxCandidates = 3;
+    lookup1.match = "exact"; // "invalid" is the most permissive match,
+                               // this will always return at least one result even if the address is invalid.
+                               // Refer to the documentation for additional MatchStrategy options.
+    this.usVerify.getAddress(lookup1).then(data =>
+      // this.addressOptions = data[0].deliveryLine1 + ' '  + data[0].lastLine
+      data.lookups.map(lookup => lookup.result.forEach(element => {
+        var obj = {text:element.deliveryLine1 + ' ' + element.lastLine
+                   ,streetLine: element.deliveryLine1
+                   ,city:element.components.cityName
+                  ,state:element.components.state
+                 , zipCode :element.components.zipCode
+                 ,postalCodeExt: element.components.plus4Code
+                , countyName  :element.metadata.countyName
+              };
+        this.addressOptions.push(obj);
+        console.log(this.addressOptions,'1');
+        console.log(element,'2');
+      }))
+      );
+    // console.log( this.addressOptions.deliveryLine1 + ' '  + this.addressOptions.lastLine);
+    this.inputAutoComplete.openPanel();
   }
   onAddressTextChange():void{
     if(this.addressForm.get('address').value == ''){
       this.addressOptions = [];
     }
   }
-  AutocompleteAddress(term: string): any {
-    const SmartyStreetsCore = SmartyStreetsSDK.core;
-    const websiteKey = environment.SMARTY_WEBSITE_KEY; // Your Website Key
-    const Lookup = SmartyStreetsSDK.usAutocomplete.Lookup;
-    const credentials = new SmartyStreetsCore.SharedCredentials(websiteKey);
-     const clientBuilder = new SmartyStreetsCore.ClientBuilder(credentials);
-    const client = clientBuilder.buildUsAutocompleteClient();
-    const lookup = new Lookup(term);
-    lookup.GeolocateType = "null";
-    lookup.MaxCandidates = 10;
-    return client.send(lookup);
-  }
+  //lookup address and populate state and city
   getAddressSelected(selectedVal: string):void{
     let selectedAddress = selectedVal;
-     this.addressOptions.forEach(element => {
-       if(element.text == selectedVal){
-         this.addressForm.get('address').setValue(element.streetLine);
-         this.addressForm.get('city').setValue(element.city);
-         this.addressForm.get('state').setValue(element.state);
-         console.log('result',element);
-       }
-     });
+    this.addressOptions.forEach(element => {
+      if(element.text == selectedVal){
+        this.addressForm.get('address').setValue(element.streetLine);
+        this.addressForm.get('city').setValue(element.city);
+        this.addressForm.get('state').setValue(element.state);
+        if(this.addressForm.controls['addressVerificationType'].value == "2"){
+          this.addressForm.get('postalCode').setValue(element.zipCode);
+          console.log('element.zipCode',element.zipCode);
+          this.addressForm.get('county').setValue(element.countyName);
+          this.addressForm.get('postalCodeExt').setValue(element.postalCodeExt);
+        }
+        console.log('result',element);
+      }
+    });
   }
+
+    //sdk call for address lookup
+    AutocompleteAddress(term: string): any {
+      const SmartyStreetsCore = SmartyStreetsSDK.core;
+      const websiteKey = environment.SMARTY_WEBSITE_KEY; // Your Website Key
+      const Lookup = SmartyStreetsSDK.usAutocomplete.Lookup;
+      const credentials = new SmartyStreetsCore.SharedCredentials(websiteKey);
+       const clientBuilder = new SmartyStreetsCore.ClientBuilder(credentials);
+      const client = clientBuilder.buildUsAutocompleteClient();
+      const lookup = new Lookup(term);
+      lookup.GeolocateType = "null";
+      lookup.MaxCandidates = 10;
+      return client.send(lookup);
+    }
 }

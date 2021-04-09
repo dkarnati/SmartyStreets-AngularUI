@@ -24,6 +24,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatMenuModule } from '@angular/material/menu';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import { DashboardComponent } from './UI/dashboard/dashboard.component';
 const appearance: MatFormFieldDefaultOptions = {
   appearance: 'outline'
@@ -49,7 +50,7 @@ const appearance: MatFormFieldDefaultOptions = {
     MatIconModule,
     MatListModule,
     MatGridListModule,
-    MatMenuModule,MatAutocompleteModule
+    MatMenuModule,MatAutocompleteModule,MatTooltipModule
   ],
   providers: [
     {

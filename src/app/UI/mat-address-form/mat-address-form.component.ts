@@ -16,17 +16,17 @@ export class MatAddressFormComponent {
     company: null,
     firstName: [null, Validators.required],
     lastName: [null, Validators.required],
-    address: ['4 NOOK ALLEY', Validators.required],
+    address: [null, Validators.required],
     address2: null,
-    city: ['Meccanicsburg', Validators.required],
-    state: ['PA', Validators.required],
+    city: [null, Validators.required],
+    state: [null, Validators.required],
     county: [{value:null, disabled: true}],
     postalCode: [null, Validators.compose([Validators.minLength(5), Validators.maxLength(5)])],
     postalCodeExt: [null, Validators.compose([Validators.minLength(4), Validators.maxLength(4)])],
-    addressVerificationType : ['2', Validators.required],
+    addressVerificationType : ['1', Validators.required],
     shipping: ['free', Validators.required]
   });
-
+  isLookup = this.addressForm.controls['addressVerificationType'].value == '1'? true:false;
   hasUnitNumber = false;
 
   @ViewChild(MatAutocompleteTrigger, {read: MatAutocompleteTrigger}) inputAutoComplete: MatAutocompleteTrigger;
@@ -93,7 +93,8 @@ export class MatAddressFormComponent {
     {name: 'Wyoming', abbreviation: 'WY'}
   ];
 
-  constructor(private fb: FormBuilder,private usVerify:UsStreetVerificationHelper) {}
+  constructor(private fb: FormBuilder,private usVerify:UsStreetVerificationHelper) {
+  }
   addressOptions = <any>[];
 
   addressChange(evt){

@@ -1,3 +1,4 @@
+import { UsStreetVerificationHelper } from './../Util/UsStreetVerificationHelper';
 import { TestNgMatComponent } from './UI/testNgMat/testNgMat.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -54,7 +55,8 @@ const appearance: MatFormFieldDefaultOptions = {
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: appearance
-    }
+    },
+    UsStreetVerificationHelper
   ],
   bootstrap: [AppComponent]
 })

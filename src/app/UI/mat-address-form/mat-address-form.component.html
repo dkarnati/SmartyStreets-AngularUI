@@ -5,6 +5,14 @@
     </mat-card-header>
     <mat-card-content>
       <!-- <div class="row">
+        <div class="col"> -->
+          <mat-radio-group aria-label="Select an option" formControlName="addressVerificationType">
+            <mat-radio-button value="1">US Address Lookup</mat-radio-button>
+            <mat-radio-button value="2">US Address Verification</mat-radio-button>
+          </mat-radio-group>
+        <!-- </div>
+        </div> -->
+      <!-- <div class="row">
         <div class="col">
           <mat-form-field class="full-width">
             <input matInput placeholder="Company" formControlName="company">
@@ -45,13 +53,13 @@
             </mat-error>
           </mat-form-field>
         </div>
-        <div class="col">
-          <!-- <button mat-raised-button type="button" color="primary" (click)="addressChange()">Lookup</button> -->
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
+        <!-- <div class="col pt-2">
           <button mat-raised-button type="button" color="primary" (click)="addressChange($event)">Lookup</button>
+        </div> -->
+      </div>
+      <div class="row" *ngIf="addressForm.controls['addressVerificationType'].value == '1'">
+        <div class="col">
+          <!-- <button mat-raised-button type="button" color="primary" (click)="addressChange($event)">Lookup</button> -->
         </div>
       </div>
       <div class="row" *ngIf="!hasUnitNumber">
@@ -65,6 +73,13 @@
         <div class="col">
           <mat-form-field class="full-width">
             <textarea matInput placeholder="Address 2" formControlName="address2"></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <mat-form-field class="full-width">
+            <input matInput placeholder="County" formControlName="county">
           </mat-form-field>
         </div>
       </div>
@@ -97,12 +112,23 @@
             <mat-hint align="end">{{postalCode.value.length}} / 5</mat-hint>
           </mat-form-field>
         </div>
+        <div class="col">
+          <mat-form-field class="full-width">
+            <input matInput #postalCodeExt maxlength="5" placeholder="Postal Code Ext." type="number" formControlName="postalCodeExt">
+            <mat-hint align="end">{{postalCodeExt.value.length}} / 5</mat-hint>
+          </mat-form-field>
+        </div>
       </div>
       <div>
       </div>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
+      <button mat-raised-button type="button" color="primary" (click)="addressChange($event)"
+      [disabled]="addressForm.controls['addressVerificationType'].value == '2'">Lookup</button>
+      <button mat-raised-button color="primary" type="submit"
+      [disabled]="addressForm.controls['addressVerificationType'].value == '1'">Verify</button>
+
     </mat-card-actions>
+
   </mat-card>
 </form>
